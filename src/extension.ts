@@ -226,7 +226,7 @@ export class Extension {
     this._workspaceObserver.reset();
     this._models = [];
 
-    const configFiles = await this._vscode.workspace.findFiles('**/*playwright*.config.{ts,js,mjs}', '**/node_modules/**');
+    const configFiles = await this._vscode.workspace.findFiles('**/integration-testing/**/playwright.config.ts', '**/node_modules/**');
 
     // Reuse already created run profiles in order to retain their 'selected' status.
     const usedProfiles = new Set<vscodeTypes.TestRunProfile>();
@@ -598,7 +598,7 @@ located next to Run / Debug Tests toolbar buttons.`);
     if (isDebug) {
       await model.debugTests(projects, locations, testListener, parametrizedTestTitle, testRun.token);
     } else {
-      await this._traceViewer.willRunTests(model.config);
+      // await this._traceViewer.willRunTests(model.config);
       await model.runTests(projects, locations, testListener, parametrizedTestTitle, testRun.token);
     }
   }

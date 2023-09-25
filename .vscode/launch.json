@@ -12,7 +12,7 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/../playwright/examples/todomvc"
+				"${workspaceFolder}/../../../work/atlassian-frontend"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"

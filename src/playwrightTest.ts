@@ -76,16 +76,7 @@ export class PlaywrightTest {
       // We only depend on playwright-core in 1.15+, bail out.
       if (v < 1.19)
         return { cli: '', version: v };
-
-      const cliInfo = await this._runNode([
-        '-e',
-        'try { const cli = require.resolve("@playwright/test/cli"); console.log(JSON.stringify({ cli })); } catch { console.log("undefined"); }',
-      ], path.dirname(configFilePath));
-      let { cli } = JSON.parse(cliInfo);
-
-      // Dogfood for 'ttest'
-      if (cli.includes('/playwright/packages/playwright-test/') && configFilePath.includes('playwright-test'))
-        cli = path.join(workspaceFolder, 'tests/playwright-test/stable-test-runner/node_modules/@playwright/test/cli.js');
+      const cli = path.join(workspaceFolder, 'build/ci/test-pipeline/scripts/run-integration-tests.js');
 
       return { cli, version: v };
     } catch (e) {
@@ -97,7 +88,7 @@ export class PlaywrightTest {
   async listFiles(config: TestConfig): Promise<ConfigListFilesReport | null> {
     const configFolder = path.dirname(config.configFile);
     const configFile = path.basename(config.configFile);
-    const allArgs = [config.cli, 'list-files', '-c', configFile];
+    const allArgs = [config.cli, '--list', '--list-format=json', 'packages/*/*'];
     {
       // For tests.
       this._log(`${escapeRegex(path.relative(config.workspaceFolder, configFolder))}> playwright list-files -c ${configFile}`);
@@ -125,7 +116,7 @@ export class PlaywrightTest {
       args.push(`--grep=${escapeRegex(parametrizedTestTitle)}`);
     if (token?.isCancellationRequested)
       return;
-    await this._reusedBrowser.willRunTests(config, false);
+    // await this._reusedBrowser.willRunTests(config, false);
     try {
       if (token?.isCancellationRequested)
         return;
@@ -164,8 +155,7 @@ export class PlaywrightTest {
       const relativeLocations = locations.map(f => path.relative(configFolder, f)).map(escapeRegex);
       this._log(`${escapeRegex(path.relative(config.workspaceFolder, configFolder))}> playwright test -c ${configFile}${args.length ? ' ' + args.join(' ') : ''}${relativeLocations.length ? ' ' + relativeLocations.join(' ') : ''}`);
     }
-    const allArgs = [config.cli, 'test',
-      '-c', configFile,
+    const allArgs = [config.cli,
       ...args,
       ...escapedLocations,
       '--repeat-each', '1',
@@ -181,6 +171,8 @@ export class PlaywrightTest {
     // Disable original reporters when listing files.
     if (mode === 'list')
       allArgs.push('--reporter', 'null');
+    console.log(`allArgs`, mode, allArgs); // aditodo remove this
+
     const childProcess = spawn(node, allArgs, {
       cwd: configFolder,
       stdio: ['pipe', 'pipe', 'pipe', 'pipe', 'pipe'],
@@ -211,8 +203,7 @@ export class PlaywrightTest {
     const configFile = path.basename(config.configFile);
     locations = locations || [];
     const escapedLocations = locations.map(escapeRegex);
-    const args = ['test',
-      '-c', configFile,
+    const args = [
       ...escapedLocations,
       '--headed',
       ...projectNames.filter(Boolean).map(p => `--project=${p}`),
@@ -231,7 +222,7 @@ export class PlaywrightTest {
     }
 
     const reporterServer = new ReporterServer();
-    await this._reusedBrowser.willRunTests(config, true);
+    // await this._reusedBrowser.willRunTests(config, true);
     try {
       await vscode.debug.startDebugging(undefined, {
         type: 'pwa-node',
