@@ -598,7 +598,7 @@ located next to Run / Debug Tests toolbar buttons.`);
     if (isDebug) {
       await model.debugTests(projects, locations, testListener, parametrizedTestTitle, testRun.token);
     } else {
-      // await this._traceViewer.willRunTests(model.config);
+      await this._traceViewer.willRunTests(model.config);
       await model.runTests(projects, locations, testListener, parametrizedTestTitle, testRun.token);
     }
   }

@@ -117,8 +117,8 @@ export class ReusedBrowser implements vscodeTypes.Disposable {
     const node = await findNode();
     const allArgs = [
       config.cli,
-      'run-server',
-      `--path=/${createGuid()}`
+      '--mode=server',
+      `--server-path=/${createGuid()}`
     ];
 
     const serverProcess = spawn(node, allArgs, {
@@ -359,7 +359,7 @@ export class ReusedBrowser implements vscodeTypes.Disposable {
 
     if (recordNew) {
       await this._backend?.resetForReuse();
-      await this._backend?.navigate({ url: 'about:blank' });
+      await this._backend?.navigate({ url: 'http://localhost:9000/examples.html' });
     }
 
     try {
@@ -393,9 +393,10 @@ export class ReusedBrowser implements vscodeTypes.Disposable {
     if (!file)
       return;
 
-    await fs.promises.writeFile(file, `import { test, expect } from '@playwright/test';
+    await fs.promises.writeFile(file, `import { test, expect } from '@af/integration-testing';
 
 test('test', async ({ page }) => {
+  await page.visitExample();
   // Recording...
 });`);
 

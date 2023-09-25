@@ -116,7 +116,7 @@ export class PlaywrightTest {
       args.push(`--grep=${escapeRegex(parametrizedTestTitle)}`);
     if (token?.isCancellationRequested)
       return;
-    // await this._reusedBrowser.willRunTests(config, false);
+    await this._reusedBrowser.willRunTests(config, false);
     try {
       if (token?.isCancellationRequested)
         return;
@@ -222,7 +222,7 @@ export class PlaywrightTest {
     }
 
     const reporterServer = new ReporterServer();
-    // await this._reusedBrowser.willRunTests(config, true);
+    await this._reusedBrowser.willRunTests(config, true);
     try {
       await vscode.debug.startDebugging(undefined, {
         type: 'pwa-node',
